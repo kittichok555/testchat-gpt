@@ -1,68 +1,56 @@
-<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI WebGPT Integration</title>
 </head>
 <body>
-
-<?php
-$github_user = 'kittichok555';
-$github_repo = 'testchat-gpt';
-
-$api_url = "https://api.github.com/repos/{$github_user}/{$github_repo}/commits";
-
-// ส่วนนี้ใช้ cURL เพื่อทำ HTTP request
-$ch = curl_init($api_url);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-// เพิ่ม header สำหรับ GitHub API token
-curl_setopt($ch, CURLOPT_HTTPHEADER, ['Authorization: Bearer YOUR_GITHUB_TOKEN']);
-$result = curl_exec($ch);
-
-// ตรวจสอบว่าได้รับข้อมูลจาก GitHub API ได้สำเร็จหรือไม่
-if ($result === false) {
-    die('Error fetching data from GitHub API');
-}
-
-curl_close($ch);
-?>
-
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ChatGPT</title>
-</head>
-<body>
-
-<form method="POST" action="test_chat.php">
     
-    <label for="user_input">ป้อนข้อความ:</label>
-    <input type="text" id="user_input" name="user_input" required>
+    <?php
 
-    <button type="submit">ส่งข้อความ</button>
-</form>
-
-<?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // รับค่าจาก POST request
-    $user_input = $_POST['user_input'];
-
-    // ทำตามที่คุณต้องการกับ $user_input
-
-    // ตัวอย่าง: ให้ ChatGPT ตอบโดยใช้ $user_input
-    $response = "คุณพูดว่า: " . $user_input;
-} else {
-    // ถ้าไม่ได้รับ POST request
-    $response = "ยังไม่ได้รับข้อมูลผ่านทาง POST";
-}
-
-// แสดงผลลัพธ์
-echo $response;
-?>
-</body>
-</html>
+    // OpenAI API key
+    $apiKey = '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';
+    
+    // ChatGPT API endpoint
+    $endpoint = 'https://api.openai.com/v1/chat/completions';
+    
+    // User input
+    $userInput = 'สวัสดี, ChatGPT!';
+    
+    // Request data
+    $data = [
+        'model' => 'gpt-3.5-turbo',
+        'messages' => [
+            ['role' => 'system', 'content' => 'You are a helpful assistant.'],
+            ['role' => 'user', 'content' => $userInput],
+        ],
+    ];
+    
+    // Set up HTTP headers
+    $headers = [
+        'Content-Type: application/json',
+        'Authorization: Bearer ' . $apiKey,
+    ];
+    
+    // Initialize cURL session
+    $ch = curl_init($endpoint);
+    
+    // Set cURL options
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    
+    // Execute cURL session
+    $response = curl_exec($ch);
+    
+    // Close cURL session
+    curl_close($ch);
+    
+    // Decode and print the response
+    $result = json_decode($response, true);
+    echo $result['choices'][0]['message']['content'];
+    
+    ?>
 </body>
 </html>
